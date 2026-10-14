@@ -1,61 +1,131 @@
-# Demo Devices Template
+# Worx Landroid
 
-This is the user documentation of the integration. Gladys re-hosts this file
-and shows a permanent **Documentation** link to it in the Configuration screen
-(in the user's language, with English as the fallback) — it is when
-configuring that the user needs it most. Keep the short onboarding hints in
-the `section` blocks of the manifest `config_schema`; put the long
-step-by-step (screenshots, troubleshooting…) here.
+## Overview
 
-## What you get
+This integration brings your **Worx Landroid** robot mowers into Gladys Assistant, and the
+mowers of the sister brands of the same cloud, **Kress** and **LandXcape**. Each mower
+becomes one device: its state, battery, rain delay and mowing times, with buttons to start,
+pause and send it back to its base.
 
-Six demo devices show up after installation: a weather station (real data
-from Open-Meteo), a switch, a dimmable light, a smart plug with power
-metering, a motion sensor and a camera.
+It reads the mowers from the vendor cloud, where the app stores them: their state arrives in
+real time (MQTT), with a regular check as a fallback.
+
+The integration is a community project, **not affiliated with Worx or Positec**. It was
+**developed without the hardware**: feedback is welcome on the repository's issues.
+
+## Requirements
+
+- Gladys Assistant 5.1 or later.
+- A mower already added in the **Worx Landroid** app (or Kress, LandXcape), and the e-mail
+  and password of that account.
+- Internet access from Gladys: the integration only talks to the vendor cloud.
 
 ## Configuration
 
-1. Open the **Configuration** tab of the integration.
-2. Set the **latitude** and **longitude** the demo weather station should
-   observe (they default to Paris), and pick your temperature unit.
-   The **refresh interval** sets how often the weather station and the
-   plug's power are read: every 5 minutes by default, every minute at most.
-3. Save: the devices appear in the **Discovery** tab, ready to be added.
+1. In Gladys, open **Integrations**, find **Worx Landroid** and install it (or **Install from
+   GitHub** with `https://github.com/guim31/gladys-landroid`).
+2. In the **Configuration** tab, choose the **brand** of your app, then enter the **e-mail**
+   and the **password** of the account.
+3. Choose the **language of the texts**: the names of the features (set when the mower is
+   added) and the status and error texts. French by default.
+4. Leave **Share the GPS position** off unless your model has GPS (4G module, RTK) and you
+   want its position in Gladys.
+5. Save. The **Check the connection** button lists the mowers found.
+6. Open the **Discovery** tab and add your mowers.
 
-The **Prefer the local connection** toggle drives the demo plug: it reports
-the channel it actually uses as a badge (local or cloud), with an orange dot
-when it runs degraded (local refused, cloud fallback).
+The tokens are kept in the integration's volume: a restart does not log in again.
 
-## Actions
+## The mower device
 
-- **Test the weather provider** — performs a live request to Open-Meteo and
-  shows the current temperature and humidity under the button.
-- **Identify a device** — pick one of your devices in the list and it will
-  signal itself (the demo light "blinks" in the logs).
+| Feature              | Type              | Detail                                                         |
+| -------------------- | ----------------- | -------------------------------------------------------------- |
+| Status               | text              | Mowing, returning to base, charging, at the base, error, rain… |
+| Error                | text              | The current fault, or "No error"                               |
+| Mowing               | yes / no          | The mower is out working                                       |
+| Battery              | %                 |                                                                |
+| Charging             | yes / no          |                                                                |
+| Battery temperature  | °C                |                                                                |
+| Rain detected        | yes / no          | The rain sensor is wet                                         |
+| Rain delay remaining | minutes           | Wait before mowing again after rain                            |
+| Rain delay           | minutes, settable | Wait after rain, 0 to 12 hours in 30-minute steps              |
+| Current zone         | number            | Zone being mowed (multi-zone models)                           |
+| Mowing time today    | minutes           | Counted from the start of the local day                        |
+| Total blade time     | hours             | Lifetime counter                                               |
+| Total mowing time    | hours             | Lifetime counter                                               |
+| Wi-Fi signal         | %                 | -100 dBm or less = 0 %, -50 dBm or more = 100 %                |
+| GPS position         | text              | Only when enabled and reported by the model                    |
+| Start mowing         | button            |                                                                |
+| Pause                | button            |                                                                |
+| Return to base       | button            |                                                                |
+| Edge cut             | button            | Only the models that have it                                   |
+| Lock                 | on / off          | The anti-theft lock (PIN)                                      |
+| Schedule             | on / off          | Turns the mowing schedule of the app on or off                 |
 
-## Scenes
+A feature only appears when the mower reports it: an older model without rain sensor has no
+rain features. Start, pause and return are buttons, not switches, so a voice assistant can
+never start the blades by mistake.
 
-The integration adds its own cards to the scene editor (Gladys 5.1 or
-later), under the **Integrations** category:
+## Widget
 
-- **Motion detected** (trigger) — starts the scene when a demo motion sensor
-  sees something move. Optionally pick the sensor and what moved (person,
-  animal); left empty, any detection matches. The following actions can
-  read what moved with `{{triggerEvent.data.target}}`.
-- **Identify a device** (action) — makes the chosen device signal itself.
-  It returns whether the device could signal itself, so the following
-  actions can depend on it.
+The **Robot mower** widget shows the state of one mower (with the fault or the rain delay
+when there is one), its battery and today's mowing time, and the **Start**, **Pause** and
+**Base** buttons (plus **Edge cut** on the models that have it). Choose the mower in the
+widget settings.
 
-## Dashboard
+## Scene triggers
 
-Add the **Demo status** widget to a dashboard: it shows the live
-temperature of the weather station and the power of the office plug, the
-connection the plug currently uses (orange when degraded) and the observed
-location. Its **Identify the light** button makes the demo light signal
-itself.
+- **Mower error**: the mower reports a new fault. Filter by mower and by kind of fault
+  (trapped, lifted or upside down, outside the boundary, blade, battery or charge, charging
+  base, cover open, other). Information passed on: mower name, error text, kind, error code.
+  Rain is not a fault: use the **Rain detected** feature.
+- **Mowing finished**: the mower is back at its base after working (end of schedule, rain or
+  on request). Information passed on: mower name, session length in minutes, battery, back
+  because of rain.
+
+## Scene action
+
+- **Mow once**: a one-time mowing session outside the schedule, from 10 to 480 minutes, with
+  or without the edge first. Only on the models with a one-time schedule.
+
+## Scene examples
+
+- **Warn me when the mower is stuck**: trigger **Mower error**, kinds _trapped_ and _lifted_ →
+  send a message "{{mower name}}: {{error}}".
+- **Mow after the sprinklers**: when the watering scene ends, action **Mow once**, 60 minutes,
+  edge first.
+- **Keep the lawn free for a party**: when the "Garden party" mode starts, press **Return to
+  base** and turn the **Schedule** off; turn it back on at the end.
 
 ## Troubleshooting
 
-The integration logs everything it does: check the integration logs from the
-Gladys UI (or `docker logs` on the host) with `LOG_LEVEL=debug` for the full
-detail.
+- **"The account refused the e-mail or password"**: check them in the vendor app, then save
+  the configuration again. The integration does not retry a refused password on its own.
+- **"The cloud asked to slow down"**: the cloud answered "too many requests". Everything
+  pauses (one hour, then longer) and resumes on its own. Do not restart the integration in a
+  loop: that would make it worse.
+- **App and integration both stopped working**: Worx may block an account for up to 24 hours.
+  The fix the community documents: on the Worx website, unlink the mower from the account,
+  then add it again in the app.
+- **Orange dot on the device badge**: the real-time link is down; the mower is read every 30
+  minutes until it comes back.
+- **A command fails with "Real-time link down"**: commands need the real-time link; wait for
+  it to come back.
+- More detail: set the `LOG_LEVEL` environment variable of the integration to `debug`.
+
+## Limits
+
+- **Cloud only**: the mowers have no local API. Without Internet, Gladys keeps the last
+  values.
+- **Quotas, to avoid the vendor's temporary bans** (no official number exists; these are the
+  conservative values of the community clients): at most 50 commands per mower per day, one
+  command every 1.1 s, 96 cloud requests per day, 5 password logins per day. The cloud is read
+  every hour while the real-time link works, every 30 minutes otherwise; the real-time link
+  reconnects after 1 minute, then waits longer each time, up to 30 minutes.
+- **Mowing time today** starts at 0 the first day: what the mower mowed before the integration
+  saw it is unknown.
+- Schedules, zones and cutting height are not edited from Gladys; firmware updates and resets
+  are left to the app on purpose.
+- The **Mowing finished** and **Mower error** events need the real-time link: while it is
+  down, a short session can go unnoticed.
+- Developed without the hardware: the field reports of Vision and RTK owners are especially
+  welcome.

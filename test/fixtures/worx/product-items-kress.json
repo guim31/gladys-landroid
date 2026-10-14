@@ -1,0 +1,97 @@
+[
+  {
+    "firmware_auto_upgrade": true,
+    "push_notifications": true,
+    "push_notifications_level": "warning",
+    "test": false,
+    "iot_registered": true,
+    "mqtt_registered": true,
+    "pending_radio_link_validation": null,
+    "purchased_at": "2023-04-01 00:00:00",
+    "warranty_registered": true,
+    "setup_location": {
+      "latitude": null,
+      "longitude": null
+    },
+    "city": null,
+    "time_zone": "Europe/Paris",
+    "lawn_size": 400,
+    "lawn_perimeter": 90,
+    "auto_schedule": false,
+    "improvement": true,
+    "diagnostic": true,
+    "created_at": "2023-04-02 10:11:12",
+    "updated_at": "2026-10-13 18:00:00",
+    "user_id": 100001,
+    "mqtt_endpoint": "iot.eu-west-1.kress-robotik.com",
+    "id": 504,
+    "uuid": "0a0b0c0d-0000-4000-8000-00000000e5f6",
+    "product_id": 303,
+    "serial_number": "20250000000000000004",
+    "mac_address": "C8F09E000004",
+    "name": "Mission",
+    "online": true,
+    "protocol": 1,
+    "capabilities": ["rtk", "border_cut"],
+    "mqtt_topics": {
+      "command_in": "KR/0a0b0c0d-0000-4000-8000-00000000e5f6/commandIn",
+      "command_out": "KR/0a0b0c0d-0000-4000-8000-00000000e5f6/commandOut"
+    },
+    "last_status": {
+      "timestamp": "2026-10-14 06:30:00",
+      "payload": {
+        "cfg": {
+          "id": 0,
+          "tz": "Europe/Paris",
+          "lg": "fr",
+          "cmd": 0,
+          "sc": {
+            "enabled": 1,
+            "paused": 0,
+            "once": {
+              "time": 0,
+              "cfg": {
+                "cut": {
+                  "b": 0,
+                  "z": []
+                }
+              }
+            },
+            "slots": []
+          },
+          "rd": 120
+        },
+        "dat": {
+          "uuid": "0a0b0c0d-0000-4000-8000-00000000e5f6",
+          "mac": "C8F09E000004",
+          "tm": "2026-10-14T06:30:00Z",
+          "fw": "4.1.0",
+          "ls": 1,
+          "le": 5,
+          "bt": {
+            "t": 15.2,
+            "p": 100,
+            "c": 0
+          },
+          "st": {
+            "b": 4000,
+            "d": 50000,
+            "wt": 4200
+          },
+          "rsi": -55,
+          "lk": 1,
+          "rain": {
+            "s": 1,
+            "cnt": 5400
+          },
+          "cut": {
+            "z": 0
+          },
+          "rtk": {
+            "pos": [45.000123, 1.000456]
+          }
+        }
+      }
+    }
+  }
+]

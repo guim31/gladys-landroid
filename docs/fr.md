@@ -1,67 +1,136 @@
-# Template de démonstration
+# Worx Landroid
 
-Ceci est la documentation utilisateur de l'intégration. Gladys ré-héberge ce
-fichier et affiche un lien **Documentation** permanent vers lui dans l'écran
-de configuration (dans la langue de l'utilisateur, avec l'anglais en repli) —
-c'est au moment de configurer que l'utilisateur en a le plus besoin. Gardez
-les courtes indications d'accueil dans les blocs `section` du `config_schema`
-du manifest ; mettez ici le pas-à-pas détaillé (captures d'écran, dépannage…).
+## Présentation
 
-## Ce que vous obtenez
+Cette intégration ajoute vos **tondeuses robots Worx Landroid** à Gladys Assistant, ainsi que
+celles des marques sœurs du même cloud, **Kress** et **LandXcape**. Chaque tondeuse devient un
+appareil : son état, sa batterie, le délai de pluie et les temps de tonte, avec des boutons pour
+la démarrer, la mettre en pause et la renvoyer à sa base.
 
-Six appareils de démonstration apparaissent après l'installation : une
-station météo (vraies données Open-Meteo), un interrupteur, une lampe
-variable, une prise connectée avec mesure de puissance, un détecteur de
-mouvement et une caméra.
+Elle lit les tondeuses depuis le cloud du constructeur, où l'application les enregistre : leur
+état arrive en temps réel (MQTT), avec une relecture régulière en secours.
+
+L'intégration est un projet communautaire, **non affilié à Worx ni à Positec**. Elle a été
+**développée sans le matériel** : vos retours sont les bienvenus dans les issues du dépôt.
+
+## Prérequis
+
+- Gladys Assistant 5.1 ou plus récent.
+- Une tondeuse déjà ajoutée dans l'application **Worx Landroid** (ou Kress, LandXcape), et
+  l'e-mail et le mot de passe de ce compte.
+- Un accès Internet depuis Gladys : l'intégration ne parle qu'au cloud du constructeur.
 
 ## Configuration
 
-1. Ouvrez l'onglet **Configuration** de l'intégration.
-2. Renseignez la **latitude** et la **longitude** que la station météo de
-   démonstration doit observer (Paris par défaut), et choisissez votre unité
-   de température. L'**intervalle de rafraîchissement** règle la fréquence
-   de lecture de la station météo et de la puissance de la prise : toutes
-   les 5 minutes par défaut, toutes les minutes au plus.
-3. Enregistrez : les appareils apparaissent dans l'onglet **Découverte**,
-   prêts à être ajoutés.
+1. Dans Gladys, ouvrez **Intégrations**, trouvez **Worx Landroid** et installez-la (ou
+   **Installer depuis GitHub** avec `https://github.com/guim31/gladys-landroid`).
+2. Dans l'onglet **Configuration**, choisissez la **marque** de votre application, puis
+   saisissez l'**e-mail** et le **mot de passe** du compte.
+3. Choisissez la **langue des textes** : les noms des fonctionnalités (fixés à l'ajout de la
+   tondeuse) et les textes d'état et d'erreur. Français par défaut.
+4. Laissez **Partager la position GPS** désactivé, sauf si votre modèle a un GPS (module 4G,
+   RTK) et que vous voulez sa position dans Gladys.
+5. Enregistrez. Le bouton **Vérifier la connexion** liste les tondeuses trouvées.
+6. Ouvrez l'onglet **Découverte** et ajoutez vos tondeuses.
 
-Le réglage **Préférer la connexion locale** pilote la prise de
-démonstration : elle affiche en badge le canal réellement utilisé (local ou
-cloud), avec un point orange quand elle fonctionne en mode dégradé (local
-refusé, bascule cloud).
+Les jetons sont gardés dans le volume de l'intégration : un redémarrage ne se reconnecte pas
+avec le mot de passe.
 
-## Actions
+## L'appareil tondeuse
 
-- **Tester le fournisseur météo** — effectue une requête en direct vers
-  Open-Meteo et affiche la température et l'humidité actuelles sous le
-  bouton.
-- **Identifier un appareil** — choisissez un de vos appareils dans la liste
-  et il se signale (la lampe de démonstration « clignote » dans les logs).
+| Fonctionnalité             | Type               | Détail                                                     |
+| -------------------------- | ------------------ | ---------------------------------------------------------- |
+| État                       | texte              | En tonte, retour à la base, en charge, à la base, erreur…  |
+| Erreur                     | texte              | La panne en cours, ou « Aucune erreur »                    |
+| En tonte                   | oui / non          | La tondeuse est sortie travailler                          |
+| Batterie                   | %                  |                                                            |
+| En charge                  | oui / non          |                                                            |
+| Température de la batterie | °C                 |                                                            |
+| Pluie détectée             | oui / non          | Le capteur de pluie est mouillé                            |
+| Délai de pluie restant     | minutes            | Attente avant de retondre après la pluie                   |
+| Délai après la pluie       | minutes, réglable  | Attente après la pluie, de 0 à 12 heures par pas de 30 min |
+| Zone en cours              | nombre             | Zone tondue (modèles multizones)                           |
+| Tonte aujourd'hui          | minutes            | Comptée depuis le début de la journée locale               |
+| Temps de lame total        | heures             | Compteur de vie                                            |
+| Temps de tonte total       | heures             | Compteur de vie                                            |
+| Signal Wi-Fi               | %                  | -100 dBm ou moins = 0 %, -50 dBm ou plus = 100 %           |
+| Position GPS               | texte              | Seulement si activée et fournie par le modèle              |
+| Démarrer la tonte          | bouton             |                                                            |
+| Pause                      | bouton             |                                                            |
+| Retour à la base           | bouton             |                                                            |
+| Tonte de bordure           | bouton             | Seulement sur les modèles qui l'ont                        |
+| Verrou                     | activé / désactivé | Le verrou antivol (code PIN)                               |
+| Planning                   | activé / désactivé | Active ou coupe le planning de tonte de l'application      |
 
-## Scènes
+Une fonctionnalité n'apparaît que si la tondeuse la fournit : un ancien modèle sans capteur de
+pluie n'a pas les fonctionnalités de pluie. Démarrer, pause et retour sont des boutons, pas des
+interrupteurs : un assistant vocal ne peut jamais lancer les lames par erreur.
 
-L'intégration ajoute ses propres cartes à l'éditeur de scènes (Gladys 5.1
-ou plus récent), dans la catégorie **Intégrations** :
+## Widget
 
-- **Mouvement détecté** (déclencheur) — lance la scène quand un détecteur
-  de démonstration voit bouger quelque chose. Choisissez éventuellement le
-  détecteur et ce qui a bougé (personne, animal) ; laissés vides, toute
-  détection correspond. Les actions suivantes peuvent lire ce qui a bougé
-  avec `{{triggerEvent.data.target}}`.
-- **Identifier un appareil** (action) — fait se signaler l'appareil choisi.
-  Elle indique si l'appareil a pu se signaler, pour que les actions
-  suivantes puissent en dépendre.
+Le widget **Tondeuse robot** affiche l'état d'une tondeuse (avec la panne ou le délai de pluie
+s'il y en a), sa batterie et le temps de tonte du jour, et les boutons **Démarrer**, **Pause**
+et **Base** (plus **Bordure** sur les modèles qui l'ont). Choisissez la tondeuse dans les
+réglages du widget.
 
-## Tableau de bord
+## Déclencheurs de scène
 
-Ajoutez le widget **État de la démo** à un tableau de bord : il affiche en
-direct la température de la station météo et la puissance de la prise du
-bureau, la connexion utilisée par la prise (en orange si dégradée) et la
-position observée. Son bouton **Identifier la lampe** fait se signaler la
-lampe de démonstration.
+- **Erreur de la tondeuse** : la tondeuse signale une nouvelle panne. Filtre par tondeuse et
+  par type de panne (bloquée, soulevée ou retournée, hors du périmètre, lame, batterie ou
+  charge, base de charge, capot ouvert, autre). Informations transmises : nom de la tondeuse,
+  texte de l'erreur, type, code d'erreur. La pluie n'est pas une panne : utilisez la
+  fonctionnalité **Pluie détectée**.
+- **Tonte terminée** : la tondeuse est rentrée à sa base après avoir travaillé (fin de
+  planning, pluie ou à la demande). Informations transmises : nom de la tondeuse, durée de la
+  session en minutes, batterie, rentrée à cause de la pluie.
+
+## Action de scène
+
+- **Tondre une fois** : une session de tonte ponctuelle hors planning, de 10 à 480 minutes,
+  avec ou sans la bordure d'abord. Seulement sur les modèles qui ont une tonte ponctuelle.
+
+## Exemples de scènes
+
+- **Prévenez-moi si la tondeuse est coincée** : déclencheur **Erreur de la tondeuse**, types
+  _bloquée_ et _soulevée_ → envoyer un message « {{nom de la tondeuse}} : {{erreur}} ».
+- **Tondre après l'arrosage** : quand la scène d'arrosage se termine, action **Tondre une
+  fois**, 60 minutes, bordure d'abord.
+- **Libérer la pelouse pour une fête** : au début du mode « Fête au jardin », appuyer sur
+  **Retour à la base** et couper le **Planning** ; le réactiver à la fin.
 
 ## Dépannage
 
-L'intégration journalise tout ce qu'elle fait : consultez les logs de
-l'intégration depuis l'interface Gladys (ou `docker logs` sur l'hôte) avec
-`LOG_LEVEL=debug` pour le détail complet.
+- **« Le compte a refusé l'e-mail ou le mot de passe »** : vérifiez-les dans l'application,
+  puis enregistrez à nouveau la configuration. L'intégration ne réessaie pas seule un mot de
+  passe refusé.
+- **« Le cloud demande de ralentir »** : le cloud a répondu « trop de requêtes ». Tout est
+  suspendu (une heure, puis plus longtemps) et reprend seul. Ne redémarrez pas l'intégration en
+  boucle : ce serait pire.
+- **L'application et l'intégration ne marchent plus toutes les deux** : Worx peut bloquer un
+  compte jusqu'à 24 heures. Le remède documenté par la communauté : sur le site de Worx,
+  dissociez la tondeuse du compte, puis ajoutez-la à nouveau dans l'application.
+- **Pastille orange sur le badge de l'appareil** : la liaison temps réel est coupée ; la
+  tondeuse est relue toutes les 30 minutes jusqu'à son retour.
+- **Une commande échoue avec « Liaison temps réel coupée »** : les commandes passent par la
+  liaison temps réel ; attendez son retour.
+- Plus de détails : réglez la variable d'environnement `LOG_LEVEL` de l'intégration sur
+  `debug`.
+
+## Limites
+
+- **Cloud uniquement** : les tondeuses n'ont pas d'API locale. Sans Internet, Gladys garde les
+  dernières valeurs.
+- **Quotas, pour éviter les blocages temporaires du constructeur** (aucun chiffre officiel
+  n'existe ; ce sont les valeurs prudentes des clients communautaires) : 50 commandes au plus
+  par tondeuse et par jour, une commande toutes les 1,1 s, 96 requêtes au cloud par jour,
+  5 connexions par mot de passe par jour. Le cloud est relu toutes les heures quand la liaison
+  temps réel fonctionne, toutes les 30 minutes sinon ; la liaison temps réel se reconnecte
+  après 1 minute, puis attend un peu plus à chaque fois, jusqu'à 30 minutes.
+- **Tonte aujourd'hui** part de 0 le premier jour : ce que la tondeuse a tondu avant que
+  l'intégration la voie est inconnu.
+- Plannings, zones et hauteur de coupe ne se modifient pas depuis Gladys ; les mises à jour du
+  micrologiciel et les réinitialisations restent volontairement à l'application.
+- Les événements **Tonte terminée** et **Erreur de la tondeuse** ont besoin de la liaison temps
+  réel : quand elle est coupée, une session courte peut passer inaperçue.
+- Développée sans le matériel : les retours des propriétaires de Vision et de RTK sont
+  particulièrement attendus.
