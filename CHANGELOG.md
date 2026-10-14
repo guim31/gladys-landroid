@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-14
+
 ### Added
 
 - Worx Landroid robot mowers in Gladys, and the Kress and LandXcape mowers of
@@ -32,4 +34,5 @@ the notes of the version's GitHub Release.
   after a "too many requests" answer.
 - Texts and documentation in English, French, German and Spanish.
 
-[Unreleased]: https://github.com/guim31/gladys-landroid/commits/main
+[Unreleased]: https://github.com/guim31/gladys-landroid/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/guim31/gladys-landroid/releases/tag/v1.0.1

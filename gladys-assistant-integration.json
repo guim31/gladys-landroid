@@ -8,8 +8,8 @@
     "de": "Worx-Landroid-Mähroboter (auch Kress, LandXcape): Status, Batterie, Regen, Start, Pause, Station.",
     "es": "Robots cortacésped Worx Landroid (Kress, LandXcape): estado, batería, lluvia, iniciar, pausa, base."
   },
-  "version": "1.0.0",
-  "docker_image": "ghcr.io/guim31/gladys-landroid:1.0.0",
+  "version": "1.0.1",
+  "docker_image": "ghcr.io/guim31/gladys-landroid:1.0.1",
   "gladys_version": ">=5.1.0",
   "cover_image": "https://raw.githubusercontent.com/guim31/gladys-landroid/main/cover.png",
   "categories": ["appliances"],
