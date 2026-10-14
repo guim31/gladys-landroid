@@ -1,177 +1,524 @@
 {
   "manifest_version": 1,
   "type": "device",
-  "name": "Demo Devices Template",
+  "name": "Worx Landroid",
   "description": {
-    "en": "Starter template showing sensors, a switch, a dimmable light and a smart plug.",
-    "fr": "Template de démarrage : capteurs, interrupteur, lampe variable et prise connectée."
+    "en": "Worx Landroid robot mowers (Kress, LandXcape too): status, battery, rain delay, start, pause, home.",
+    "fr": "Tondeuses robots Worx Landroid (Kress, LandXcape) : état, batterie, pluie, démarrer, pause, base.",
+    "de": "Worx-Landroid-Mähroboter (auch Kress, LandXcape): Status, Batterie, Regen, Start, Pause, Station.",
+    "es": "Robots cortacésped Worx Landroid (Kress, LandXcape): estado, batería, lluvia, iniciar, pausa, base."
   },
   "version": "1.0.0",
-  "docker_image": "ghcr.io/gladysassistant/integration-template-js:1.0.0",
+  "docker_image": "ghcr.io/guim31/gladys-landroid:1.0.0",
   "gladys_version": ">=5.1.0",
-  "cover_image": "https://raw.githubusercontent.com/GladysAssistant/integration-template-js/master/cover.png",
-  "categories": ["lighting", "security", "environment"],
-  "transports": ["local", "cloud"],
+  "cover_image": "https://raw.githubusercontent.com/guim31/gladys-landroid/main/cover.png",
+  "categories": ["appliances"],
+  "transports": ["cloud"],
   "config_schema": [
     {
       "key": "intro",
       "type": "section",
-      "label": { "en": "Getting started", "fr": "Pour commencer" },
+      "label": {
+        "en": "Your vendor account",
+        "fr": "Votre compte constructeur",
+        "de": "Dein Herstellerkonto",
+        "es": "Su cuenta del fabricante"
+      },
       "description": {
-        "en": "The demo weather station reads real data from the free Open-Meteo API: pick the coordinates to observe. No account, no API key.",
-        "fr": "La station météo de démonstration lit de vraies données via l'API gratuite Open-Meteo : choisissez les coordonnées à observer. Pas de compte, pas de clé d'API."
+        "en": "Use the e-mail and password of the Worx Landroid (or Kress, LandXcape) app, where your mowers are already added. The integration reads them from the vendor cloud and is not affiliated with Worx or Positec.",
+        "fr": "Utilisez l'e-mail et le mot de passe de l'application Worx Landroid (ou Kress, LandXcape), où vos tondeuses sont déjà ajoutées. L'intégration les lit depuis le cloud du constructeur et n'est pas affiliée à Worx ni à Positec.",
+        "de": "Nutze E-Mail und Passwort der App Worx Landroid (oder Kress, LandXcape), in der deine Mähroboter schon hinzugefügt sind. Die Integration liest sie aus der Hersteller-Cloud und ist nicht mit Worx oder Positec verbunden.",
+        "es": "Use el correo y la contraseña de la aplicación Worx Landroid (o Kress, LandXcape), donde sus robots ya están añadidos. La integración los lee desde la nube del fabricante y no está afiliada a Worx ni a Positec."
       },
       "links": [
         {
-          "url": "https://open-meteo.com/en/docs",
-          "label": { "en": "Open-Meteo documentation", "fr": "Documentation Open-Meteo" }
+          "url": "https://github.com/guim31/gladys-landroid/blob/main/docs/en.md",
+          "label": {
+            "en": "Setup guide",
+            "fr": "Guide d'installation",
+            "de": "Installationsanleitung",
+            "es": "Guía de instalación"
+          }
         }
       ]
     },
     {
-      "key": "latitude",
-      "type": "number",
-      "label": { "en": "Latitude", "fr": "Latitude" },
-      "description": {
-        "en": "Latitude used for the demo weather sensor.",
-        "fr": "Latitude utilisée par le capteur météo de démonstration."
-      },
-      "placeholder": { "en": "e.g. 48.8566", "fr": "ex. 48.8566" },
-      "required": true,
-      "default": 48.8566,
-      "min": -90,
-      "max": 90
-    },
-    {
-      "key": "longitude",
-      "type": "number",
-      "label": { "en": "Longitude", "fr": "Longitude" },
-      "description": {
-        "en": "Longitude used for the demo weather sensor.",
-        "fr": "Longitude utilisée par le capteur météo de démonstration."
-      },
-      "placeholder": { "en": "e.g. 2.3522", "fr": "ex. 2.3522" },
-      "required": true,
-      "default": 2.3522,
-      "min": -180,
-      "max": 180
-    },
-    {
-      "key": "unit",
+      "key": "brand",
       "type": "select",
-      "label": { "en": "Temperature unit", "fr": "Unité de température" },
-      "required": false,
-      "default": "celsius",
+      "label": {
+        "en": "Brand",
+        "fr": "Marque",
+        "de": "Marke",
+        "es": "Marca"
+      },
+      "description": {
+        "en": "The app your account was created in.",
+        "fr": "L’application dans laquelle votre compte a été créé.",
+        "de": "Die App, in der dein Konto erstellt wurde.",
+        "es": "La aplicación en la que se creó su cuenta."
+      },
+      "required": true,
+      "default": "worx",
       "options": [
-        { "value": "celsius", "label": { "en": "Celsius", "fr": "Celsius" } },
-        { "value": "fahrenheit", "label": { "en": "Fahrenheit", "fr": "Fahrenheit" } }
+        {
+          "value": "worx",
+          "label": {
+            "en": "Worx Landroid",
+            "fr": "Worx Landroid",
+            "de": "Worx Landroid",
+            "es": "Worx Landroid"
+          }
+        },
+        {
+          "value": "kress",
+          "label": {
+            "en": "Kress",
+            "fr": "Kress",
+            "de": "Kress",
+            "es": "Kress"
+          }
+        },
+        {
+          "value": "landxcape",
+          "label": {
+            "en": "LandXcape",
+            "fr": "LandXcape",
+            "de": "LandXcape",
+            "es": "LandXcape"
+          }
+        }
       ]
     },
     {
-      "key": "poll_frequency",
-      "type": "number",
-      "label": { "en": "Refresh interval (s)", "fr": "Intervalle de rafraîchissement (s)" },
+      "key": "email",
+      "type": "string",
+      "label": {
+        "en": "E-mail",
+        "fr": "E-mail",
+        "de": "E-Mail",
+        "es": "Correo electrónico"
+      },
+      "placeholder": {
+        "en": "e.g. name@example.com",
+        "fr": "ex. nom@exemple.fr",
+        "de": "z. B. name@beispiel.de",
+        "es": "p. ej. nombre@ejemplo.es"
+      },
+      "required": true
+    },
+    {
+      "key": "password",
+      "type": "secret",
+      "label": {
+        "en": "Password",
+        "fr": "Mot de passe",
+        "de": "Passwort",
+        "es": "Contraseña"
+      },
+      "required": true
+    },
+    {
+      "key": "language",
+      "type": "select",
+      "label": {
+        "en": "Language of the texts",
+        "fr": "Langue des textes",
+        "de": "Sprache der Texte",
+        "es": "Idioma de los textos"
+      },
       "description": {
-        "en": "How often sensors are polled, in seconds (one minute minimum).",
-        "fr": "Fréquence d'interrogation des capteurs, en secondes (une minute minimum)."
+        "en": "Language of the feature names (set when the mower is added) and of the status and error texts.",
+        "fr": "Langue des noms de fonctionnalités (fixés à l'ajout de la tondeuse) et des textes d'état et d'erreur.",
+        "de": "Sprache der Funktionsnamen (beim Hinzufügen festgelegt) und der Status- und Fehlertexte.",
+        "es": "Idioma de los nombres de las funciones (fijados al añadir el robot) y de los textos de estado y error."
+      },
+      "required": true,
+      "default": "fr",
+      "options": [
+        {
+          "value": "en",
+          "label": {
+            "en": "English",
+            "fr": "Anglais",
+            "de": "Englisch",
+            "es": "Inglés"
+          }
+        },
+        {
+          "value": "fr",
+          "label": {
+            "en": "French",
+            "fr": "Français",
+            "de": "Französisch",
+            "es": "Francés"
+          }
+        },
+        {
+          "value": "de",
+          "label": {
+            "en": "German",
+            "fr": "Allemand",
+            "de": "Deutsch",
+            "es": "Alemán"
+          }
+        },
+        {
+          "value": "es",
+          "label": {
+            "en": "Spanish",
+            "fr": "Espagnol",
+            "de": "Spanisch",
+            "es": "Español"
+          }
+        }
+      ]
+    },
+    {
+      "key": "gps_enabled",
+      "type": "boolean",
+      "label": {
+        "en": "Share the GPS position",
+        "fr": "Partager la position GPS",
+        "de": "GPS-Position teilen",
+        "es": "Compartir la posición GPS"
+      },
+      "description": {
+        "en": "Only for the models with GPS (4G module, RTK). Off by default: the position is personal data.",
+        "fr": "Seulement pour les modèles avec GPS (module 4G, RTK). Désactivé par défaut : la position est une donnée personnelle.",
+        "de": "Nur für Modelle mit GPS (4G-Modul, RTK). Standardmäßig aus: die Position ist ein persönliches Datum.",
+        "es": "Solo para los modelos con GPS (módulo 4G, RTK). Desactivado por defecto: la posición es un dato personal."
       },
       "required": false,
-      "default": 300,
-      "min": 60,
-      "max": 3600
+      "default": false
     }
   ],
   "actions": [
     {
-      "key": "test_weather",
-      "label": { "en": "Test the weather provider", "fr": "Tester le fournisseur météo" },
-      "timeout_seconds": 30
-    },
-    {
-      "key": "identify",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
-        }
-      ]
+      "key": "check_connection",
+      "label": {
+        "en": "Check the connection",
+        "fr": "Vérifier la connexion",
+        "de": "Verbindung prüfen",
+        "es": "Comprobar la conexión"
+      },
+      "timeout_seconds": 60
     }
   ],
   "scene_triggers": [
     {
-      "key": "motion_detected",
-      "label": { "en": "Motion detected", "fr": "Mouvement détecté" },
+      "key": "mower_error",
+      "label": {
+        "en": "Mower error",
+        "fr": "Erreur de la tondeuse",
+        "de": "Fehler des Mähroboters",
+        "es": "Error del robot"
+      },
       "description": {
-        "en": "A demo motion sensor saw a person or an animal move.",
-        "fr": "Un détecteur de démonstration a vu bouger une personne ou un animal."
+        "en": "The mower reports a new fault: trapped, lifted, outside the boundary... Rain is not a fault.",
+        "fr": "La tondeuse signale une nouvelle panne : bloquée, soulevée, hors périmètre... La pluie n’en est pas une.",
+        "de": "Der Mähroboter meldet einen neuen Fehler: festgefahren, angehoben, außerhalb... Regen ist keiner.",
+        "es": "El robot indica un nuevo fallo: atascado, levantado, fuera del perímetro... La lluvia no lo es."
       },
       "fields": [
         {
           "key": "device",
           "type": "select",
           "source": "devices",
-          "label": { "en": "Sensor", "fr": "Détecteur" }
+          "label": {
+            "en": "Mower",
+            "fr": "Tondeuse",
+            "de": "Mähroboter",
+            "es": "Robot cortacésped"
+          }
         },
         {
-          "key": "target",
+          "key": "kind",
           "type": "multi_select",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" },
+          "label": {
+            "en": "Kind of fault",
+            "fr": "Type de panne",
+            "de": "Art des Fehlers",
+            "es": "Tipo de fallo"
+          },
           "options": [
-            { "value": "person", "label": { "en": "Person", "fr": "Personne" } },
-            { "value": "animal", "label": { "en": "Animal", "fr": "Animal" } }
+            {
+              "value": "trapped",
+              "label": {
+                "en": "Trapped",
+                "fr": "Bloquée",
+                "de": "Festgefahren",
+                "es": "Atascado"
+              }
+            },
+            {
+              "value": "lifted",
+              "label": {
+                "en": "Lifted or upside down",
+                "fr": "Soulevée ou retournée",
+                "de": "Angehoben oder umgekippt",
+                "es": "Levantado o volcado"
+              }
+            },
+            {
+              "value": "outside",
+              "label": {
+                "en": "Outside the boundary",
+                "fr": "Hors du périmètre",
+                "de": "Außerhalb der Begrenzung",
+                "es": "Fuera del perímetro"
+              }
+            },
+            {
+              "value": "blade",
+              "label": {
+                "en": "Blade",
+                "fr": "Lame",
+                "de": "Messer",
+                "es": "Cuchilla"
+              }
+            },
+            {
+              "value": "battery",
+              "label": {
+                "en": "Battery or charge",
+                "fr": "Batterie ou charge",
+                "de": "Batterie oder Laden",
+                "es": "Batería o carga"
+              }
+            },
+            {
+              "value": "docking",
+              "label": {
+                "en": "Charging base",
+                "fr": "Base de charge",
+                "de": "Ladestation",
+                "es": "Base de carga"
+              }
+            },
+            {
+              "value": "cover",
+              "label": {
+                "en": "Cover open",
+                "fr": "Capot ouvert",
+                "de": "Abdeckung offen",
+                "es": "Tapa abierta"
+              }
+            },
+            {
+              "value": "other",
+              "label": {
+                "en": "Other",
+                "fr": "Autre",
+                "de": "Sonstiges",
+                "es": "Otro"
+              }
+            }
           ]
         }
       ],
       "variables": [
         {
-          "key": "target",
+          "key": "device_name",
           "type": "string",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" }
+          "label": {
+            "en": "Mower name",
+            "fr": "Nom de la tondeuse",
+            "de": "Name des Mähroboters",
+            "es": "Nombre del robot"
+          }
+        },
+        {
+          "key": "error",
+          "type": "string",
+          "label": {
+            "en": "Error",
+            "fr": "Erreur",
+            "de": "Fehler",
+            "es": "Error"
+          }
+        },
+        {
+          "key": "kind",
+          "type": "string",
+          "label": {
+            "en": "Kind of fault",
+            "fr": "Type de panne",
+            "de": "Art des Fehlers",
+            "es": "Tipo de fallo"
+          }
+        },
+        {
+          "key": "code",
+          "type": "number",
+          "label": {
+            "en": "Error code",
+            "fr": "Code d'erreur",
+            "de": "Fehlercode",
+            "es": "Código de error"
+          }
+        }
+      ]
+    },
+    {
+      "key": "mowing_finished",
+      "label": {
+        "en": "Mowing finished",
+        "fr": "Tonte terminée",
+        "de": "Mähen beendet",
+        "es": "Corte terminado"
+      },
+      "description": {
+        "en": "The mower is back at its base after working: end of schedule, rain or on request.",
+        "fr": "La tondeuse est rentrée à sa base après avoir travaillé : fin de planning, pluie ou à la demande.",
+        "de": "Der Mähroboter ist nach der Arbeit zurück in der Ladestation: Zeitplanende, Regen oder auf Wunsch.",
+        "es": "El robot ha vuelto a su base tras trabajar: fin de programación, lluvia o a petición."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Mower",
+            "fr": "Tondeuse",
+            "de": "Mähroboter",
+            "es": "Robot cortacésped"
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "device_name",
+          "type": "string",
+          "label": {
+            "en": "Mower name",
+            "fr": "Nom de la tondeuse",
+            "de": "Name des Mähroboters",
+            "es": "Nombre del robot"
+          }
+        },
+        {
+          "key": "duration_minutes",
+          "type": "number",
+          "label": {
+            "en": "Session length (min)",
+            "fr": "Durée de la session (min)",
+            "de": "Dauer der Sitzung (min)",
+            "es": "Duración de la sesión (min)"
+          }
+        },
+        {
+          "key": "battery",
+          "type": "number",
+          "label": {
+            "en": "Battery (%)",
+            "fr": "Batterie (%)",
+            "de": "Batterie (%)",
+            "es": "Batería (%)"
+          }
+        },
+        {
+          "key": "rain",
+          "type": "boolean",
+          "label": {
+            "en": "Back because of rain",
+            "fr": "Rentrée à cause de la pluie",
+            "de": "Wegen Regen zurück",
+            "es": "Volvió por la lluvia"
+          }
         }
       ]
     }
   ],
   "scene_actions": [
     {
-      "key": "identify_device",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "description": {
-        "en": "Make a device signal itself (the demo light blinks).",
-        "fr": "Fait se signaler un appareil (la lampe de démonstration clignote)."
+      "key": "mow_once",
+      "label": {
+        "en": "Mow once",
+        "fr": "Tondre une fois",
+        "de": "Einmal mähen",
+        "es": "Cortar una vez"
       },
-      "timeout_seconds": 15,
+      "description": {
+        "en": "A one-time mowing session outside the schedule, with or without the edge first.",
+        "fr": "Une session de tonte ponctuelle hors planning, avec ou sans la bordure d’abord.",
+        "de": "Eine einmalige Mähsitzung außerhalb des Zeitplans, mit oder ohne Kante zuerst.",
+        "es": "Una sesión de corte puntual fuera de la programación, con o sin los bordes primero."
+      },
+      "timeout_seconds": 30,
       "fields": [
         {
           "key": "device",
           "type": "select",
           "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
+          "label": {
+            "en": "Mower",
+            "fr": "Tondeuse",
+            "de": "Mähroboter",
+            "es": "Robot cortacésped"
+          },
           "required": true
-        }
-      ],
-      "outputs": [
+        },
         {
-          "key": "signalled",
+          "key": "duration",
+          "type": "number",
+          "label": {
+            "en": "Duration (minutes)",
+            "fr": "Durée (minutes)",
+            "de": "Dauer (Minuten)",
+            "es": "Duración (minutos)"
+          },
+          "required": true,
+          "default": 60,
+          "min": 10,
+          "max": 480
+        },
+        {
+          "key": "edge",
           "type": "boolean",
-          "label": { "en": "Device signalled", "fr": "Appareil signalé" }
+          "label": {
+            "en": "Cut the edge first",
+            "fr": "Tondre la bordure d’abord",
+            "de": "Zuerst die Kante mähen",
+            "es": "Cortar los bordes primero"
+          },
+          "required": false,
+          "default": false
         }
       ]
     }
   ],
   "widgets": [
     {
-      "key": "demo_status",
-      "label": { "en": "Demo status", "fr": "État de la démo" },
-      "description": {
-        "en": "Live temperature and plug power, plug connection and observed location.",
-        "fr": "Température et puissance en direct, connexion de la prise, position observée."
+      "key": "mower",
+      "label": {
+        "en": "Robot mower",
+        "fr": "Tondeuse robot",
+        "de": "Mähroboter",
+        "es": "Robot cortacésped"
       },
-      "icon": "activity",
-      "action_timeout_seconds": 15
+      "description": {
+        "en": "State, battery and mowing time of a mower, with start, pause and return to base.",
+        "fr": "État, batterie et temps de tonte d’une tondeuse, avec démarrer, pause et retour à la base.",
+        "de": "Status, Batterie und Mähzeit eines Mähroboters, mit Start, Pause und Rückkehr.",
+        "es": "Estado, batería y tiempo de corte de un robot, con iniciar, pausa y volver a la base."
+      },
+      "icon": "scissors",
+      "action_timeout_seconds": 20,
+      "settings": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Mower",
+            "fr": "Tondeuse",
+            "de": "Mähroboter",
+            "es": "Robot cortacésped"
+          },
+          "required": true
+        }
+      ]
     }
   ]
 }

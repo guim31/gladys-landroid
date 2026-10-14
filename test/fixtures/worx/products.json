@@ -1,0 +1,26 @@
+[
+  {
+    "id": 101,
+    "code": "WR141E",
+    "default_name": "Landroid M",
+    "meters": 500,
+    "product_year": 2019,
+    "cutting_width": 18
+  },
+  {
+    "id": 202,
+    "code": "WR206E",
+    "default_name": "Landroid Vision M",
+    "meters": 600,
+    "product_year": 2023,
+    "cutting_width": 18
+  },
+  {
+    "id": 303,
+    "code": "KR233E",
+    "default_name": "Kress Mission RTK",
+    "meters": 1000,
+    "product_year": 2025,
+    "cutting_width": 22
+  }
+]

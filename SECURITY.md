@@ -30,6 +30,22 @@ Gladys before reporting a problem.
 
 In scope: the code of this repository and the Docker image it publishes.
 
+What the integration stores and sends:
+
+- The **e-mail and password** of the vendor account live in the Gladys
+  configuration of the integration (the password is a secret field). They are
+  only sent to the vendor's login endpoint (`id.worx.com`, `id.kress.com` or
+  `id.landxcape-services.com`), over HTTPS.
+- The **access and refresh tokens** are stored in `/data/session.json`
+  (readable by the container user only), next to a hash of the brand and
+  e-mail — never the e-mail itself. `/data` also holds the rolling request
+  counters (`limits.json`), the day's mowing baseline (`daily.json`) and a
+  random MQTT client id (`client.json`).
+- Network: HTTPS to the vendor REST API, and MQTT over secure WebSocket to the
+  vendor's AWS IoT endpoint. Nothing else, nothing on the local network.
+- The logs never contain the password, the e-mail or a token, at any level
+  (a test checks it). The GPS position is only read when the user turns it on.
+
 Out of scope: Gladys Assistant itself (see its
 [security policy](https://github.com/GladysAssistant/Gladys/security/policy)),
-and the third-party services and devices the integration talks to.
+and the vendor cloud and mowers the integration talks to.

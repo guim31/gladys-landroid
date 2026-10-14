@@ -1,0 +1,400 @@
+[
+  {
+    "firmware_auto_upgrade": true,
+    "push_notifications": true,
+    "push_notifications_level": "warning",
+    "test": false,
+    "iot_registered": true,
+    "mqtt_registered": true,
+    "pending_radio_link_validation": null,
+    "purchased_at": "2023-04-01 00:00:00",
+    "warranty_registered": true,
+    "setup_location": {
+      "latitude": null,
+      "longitude": null
+    },
+    "city": null,
+    "time_zone": "Europe/Paris",
+    "lawn_size": 400,
+    "lawn_perimeter": 90,
+    "auto_schedule": false,
+    "improvement": true,
+    "diagnostic": true,
+    "created_at": "2023-04-02 10:11:12",
+    "updated_at": "2026-10-13 18:00:00",
+    "user_id": 100001,
+    "mqtt_endpoint": "iot.eu-west-1.worxlandroid.com",
+    "id": 501,
+    "uuid": null,
+    "product_id": 101,
+    "serial_number": "20230000000000000001",
+    "mac_address": "F0FE6B000001",
+    "name": "Pelouse avant",
+    "locked": false,
+    "firmware_version": "3.36",
+    "online": true,
+    "protocol": 0,
+    "capabilities": ["border_cut"],
+    "distance_covered": 812345,
+    "mower_work_time": 60321,
+    "blade_work_time": 51234,
+    "blade_work_time_reset": null,
+    "blade_work_time_reset_at": null,
+    "battery_charge_cycles": 642,
+    "battery_charge_cycles_reset": null,
+    "battery_charge_cycles_reset_at": null,
+    "mqtt_topics": {
+      "command_in": "DB510/F0FE6B000001/commandIn",
+      "command_out": "DB510/F0FE6B000001/commandOut"
+    },
+    "last_status": {
+      "timestamp": "2026-10-14 07:58:12",
+      "payload": {
+        "cfg": {
+          "id": 31007,
+          "sn": "20230000000000000001",
+          "dt": "14/10/2026",
+          "tm": "09:58:10",
+          "lg": "fr",
+          "cmd": 0,
+          "sc": {
+            "m": 1,
+            "distm": 0,
+            "p": 0,
+            "d": [
+              ["10:00", 120, 0],
+              ["10:00", 120, 1],
+              ["10:00", 120, 0],
+              ["10:00", 120, 0],
+              ["10:00", 120, 1],
+              ["10:00", 120, 0],
+              ["10:00", 120, 0]
+            ],
+            "dd": [
+              ["00:00", 0, 0],
+              ["00:00", 0, 0],
+              ["00:00", 0, 0],
+              ["00:00", 0, 0],
+              ["00:00", 0, 0],
+              ["00:00", 0, 0],
+              ["00:00", 0, 0]
+            ],
+            "ots": {
+              "bc": 0,
+              "wtm": 0
+            }
+          },
+          "mz": [0, 15, 40, 0],
+          "mzv": [0, 0, 1, 1, 2, 2, 0, 1, 2, 0],
+          "mzk": 0,
+          "rd": 60,
+          "al": {
+            "lvl": 0,
+            "t": 60
+          },
+          "tq": 0,
+          "modules": {}
+        },
+        "dat": {
+          "mac": "F0FE6B000001",
+          "fw": 3.36,
+          "fwb": 1,
+          "ls": 1,
+          "le": 0,
+          "conn": "wifi",
+          "bt": {
+            "t": 21.5,
+            "v": 19.81,
+            "p": 87,
+            "nr": 642,
+            "c": 1,
+            "m": 1
+          },
+          "dmp": [0.4, -1.2, 102.6],
+          "st": {
+            "b": 51234,
+            "d": 812345,
+            "wt": 60321,
+            "bl": 88
+          },
+          "act": 1,
+          "rsi": -62,
+          "lk": 0,
+          "tr": 0,
+          "lz": 3,
+          "rain": {
+            "s": 0,
+            "cnt": 0
+          },
+          "modules": {}
+        }
+      }
+    }
+  },
+  {
+    "firmware_auto_upgrade": true,
+    "push_notifications": true,
+    "push_notifications_level": "warning",
+    "test": false,
+    "iot_registered": true,
+    "mqtt_registered": true,
+    "pending_radio_link_validation": null,
+    "purchased_at": "2023-04-01 00:00:00",
+    "warranty_registered": true,
+    "setup_location": {
+      "latitude": null,
+      "longitude": null
+    },
+    "city": null,
+    "time_zone": "Europe/Paris",
+    "lawn_size": 400,
+    "lawn_perimeter": 90,
+    "auto_schedule": false,
+    "improvement": true,
+    "diagnostic": true,
+    "created_at": "2023-04-02 10:11:12",
+    "updated_at": "2026-10-13 18:00:00",
+    "user_id": 100001,
+    "mqtt_endpoint": "iot.eu-west-1.worxlandroid.com",
+    "id": 502,
+    "uuid": "6f1b2c3d-0000-4000-8000-00000000a1b2",
+    "product_id": 202,
+    "serial_number": "20240000000000000002",
+    "mac_address": "B48C9D000002",
+    "name": "Jardin",
+    "locked": false,
+    "firmware_version": "3.30.0+2",
+    "online": true,
+    "protocol": 1,
+    "capabilities": ["vision", "border_cut"],
+    "mqtt_topics": {
+      "command_in": "RVM100/6f1b2c3d-0000-4000-8000-00000000a1b2/commandIn",
+      "command_out": "RVM100/6f1b2c3d-0000-4000-8000-00000000a1b2/commandOut"
+    },
+    "last_status": {
+      "timestamp": "2026-10-14 08:01:41",
+      "payload": {
+        "cfg": {
+          "id": 0,
+          "tz": "Europe/Paris",
+          "lg": "fr",
+          "cmd": 0,
+          "log": {
+            "imp": 1,
+            "diag": 1
+          },
+          "vis": {
+            "slab": 0
+          },
+          "sc": {
+            "enabled": 1,
+            "paused": 0,
+            "once": {
+              "time": 0,
+              "cfg": {
+                "cut": {
+                  "b": 0,
+                  "z": []
+                }
+              }
+            },
+            "slots": [
+              {
+                "e": 1,
+                "d": 1,
+                "s": 600,
+                "t": 180,
+                "cfg": {
+                  "cut": {
+                    "b": 1,
+                    "z": []
+                  }
+                }
+              },
+              {
+                "e": 1,
+                "d": 4,
+                "s": 600,
+                "t": 180,
+                "cfg": {
+                  "cut": {
+                    "b": 0,
+                    "z": []
+                  }
+                }
+              }
+            ]
+          },
+          "rd": 0,
+          "al": {
+            "lvl": 0,
+            "t": 60
+          },
+          "tq": 0,
+          "modules": {
+            "DF": {
+              "fh": 0,
+              "cut": 1
+            },
+            "HL": {
+              "enabled": 0
+            }
+          }
+        },
+        "dat": {
+          "uuid": "6f1b2c3d-0000-4000-8000-00000000a1b2",
+          "mac": "B48C9D000002",
+          "tm": "2026-10-14T08:01:41.646Z",
+          "fw": "3.30.0+2",
+          "ls": 7,
+          "le": 0,
+          "conn": "wifi",
+          "bt": {
+            "t": 28.4,
+            "v": 19.6,
+            "p": 64,
+            "nr": 56,
+            "c": 0,
+            "m": 0
+          },
+          "head": {
+            "uuid": "6f1b2c3d-0000-4000-8000-00000000c3d4",
+            "fw": "1.2.9+1",
+            "act": 1
+          },
+          "dmp": [0.3, 1.1, 260.6],
+          "st": {
+            "b": 2747,
+            "d": 37481,
+            "wt": 2845,
+            "bl": 90
+          },
+          "act": 1,
+          "features": {
+            "ble": 0
+          },
+          "rsi": -71,
+          "lk": 0,
+          "tr": 0,
+          "rain": {
+            "s": 0,
+            "cnt": 0
+          },
+          "sh": 0,
+          "sc": {
+            "slot": 0,
+            "once": 0
+          },
+          "cut": {
+            "z": 1
+          },
+          "mz": [
+            {
+              "id": 1,
+              "p": 0,
+              "a": 0
+            }
+          ],
+          "cam": {
+            "status": 0,
+            "error": 0
+          },
+          "rfid": {
+            "status": 0
+          },
+          "modules": {
+            "DF": {
+              "stat": "ok"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "firmware_auto_upgrade": true,
+    "push_notifications": true,
+    "push_notifications_level": "warning",
+    "test": false,
+    "iot_registered": true,
+    "mqtt_registered": true,
+    "pending_radio_link_validation": null,
+    "purchased_at": "2023-04-01 00:00:00",
+    "warranty_registered": true,
+    "setup_location": {
+      "latitude": null,
+      "longitude": null
+    },
+    "city": null,
+    "time_zone": "Europe/Paris",
+    "lawn_size": 400,
+    "lawn_perimeter": 90,
+    "auto_schedule": false,
+    "improvement": true,
+    "diagnostic": true,
+    "created_at": "2023-04-02 10:11:12",
+    "updated_at": "2026-10-13 18:00:00",
+    "user_id": 100001,
+    "mqtt_endpoint": "iot.eu-west-1.worxlandroid.com",
+    "id": 503,
+    "uuid": null,
+    "product_id": 999,
+    "serial_number": "20180000000000000003",
+    "mac_address": "F0FE6B000003",
+    "name": null,
+    "locked": false,
+    "firmware_version": "2.80",
+    "online": false,
+    "protocol": 0,
+    "capabilities": [],
+    "mqtt_topics": {
+      "command_in": "PRM100/F0FE6B000003/commandIn",
+      "command_out": "PRM100/F0FE6B000003/commandOut"
+    },
+    "last_status": {
+      "timestamp": "2026-09-30 17:00:00",
+      "payload": {
+        "cfg": {
+          "id": 12,
+          "sn": "20180000000000000003",
+          "dt": "30/09/2026",
+          "tm": "19:00:00",
+          "lg": "fr",
+          "cmd": 0,
+          "sc": {
+            "m": 1,
+            "p": 0,
+            "d": [
+              ["14:00", 60, 0],
+              ["14:00", 60, 0],
+              ["14:00", 60, 0],
+              ["14:00", 60, 0],
+              ["14:00", 60, 0],
+              ["14:00", 60, 0],
+              ["14:00", 60, 0]
+            ]
+          },
+          "rd": 30
+        },
+        "dat": {
+          "mac": "F0FE6B000003",
+          "fw": 2.8,
+          "ls": 1,
+          "le": 0,
+          "bt": {
+            "t": 18,
+            "v": 19.2,
+            "p": 100,
+            "nr": 1201,
+            "c": 0
+          },
+          "st": {
+            "b": 99000,
+            "d": 1500000,
+            "wt": 101000
+          }
+        }
+      }
+    }
+  }
+]

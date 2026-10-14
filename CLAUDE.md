@@ -31,16 +31,28 @@ pushing.
 ## Architecture
 
 ```
-index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
-src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
+index.js                          SDK wiring only: builds the client, the /data store, mqtt.connect
+src/app.js                        registers every handler on the client (tested end to end)
+src/hub.js                        the account's mowers: REST timer, MQTT messages, states, commands
+src/devices.js                    mower → Gladys device: feature catalog, states, status text
+src/triggers.js                   scene triggers (mower_error, mowing_finished), one per transition
+src/widgets.js                    the "mower" dashboard widget
+src/daily.js                      mowing time today, from the lifetime work counter
+src/i18n.js                       every text, in en / fr / de / es
+src/issues.js                     a repeated failure logged once, its recovery once
+src/store.js                      JSON files under /data (atomic, owner-only)
 src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
+src/worx/api.js                   REST client of the Positec cloud (OAuth2 password grant)
+src/worx/session.js               tokens in /data, refresh, login and 429 guards
+src/worx/limits.js                the anti-ban budgets (rolling 24 h, stored in /data)
+src/worx/mqtt.js                  MQTT over WSS to AWS IoT (custom authorizer), own backoff
+src/worx/mower.js                 payload decoding (protocol 0 and 1), command envelopes
+src/worx/codes.js                 status and error code tables, activities, fault kinds
+src/worx/clouds.js                the three brands: hosts, client ids, MQTT prefix
+scripts/probe.mjs                 read-only probe of the real cloud (run where there is network)
 gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
-test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
+docs/{en,fr,de,es}.md             user documentation, re-hosted by Gladys, same sections
+test/                             node --test, SDK fake Gladys + fake cloud + fake broker
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -70,8 +82,10 @@ test/                             node --test, against the SDK's fake Gladys (in
   `type: "provider"`: 5.1.0). `test/manifest.test.js` ties the manifest to the
   code (defaults, action, scene and widget handlers): change both sides
   together.
-- **User-facing text** is bilingual (English and French): action messages,
-  manifest texts, and `docs/en.md` / `docs/fr.md`, kept in sync.
+- **User-facing text** exists in four languages (English, French, German with
+  "du", Spanish with "usted"): action messages, manifest texts, feature names,
+  widget texts, and `docs/en.md`, `docs/fr.md`, `docs/de.md`, `docs/es.md`,
+  kept in sync (`test/i18n.test.js`).
 - **Style.** Prettier formats, ESLint catches mistakes. Comments explain why,
   in English. Tests never touch the network.
 
@@ -233,3 +247,53 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
 - Docs `en`, `fr`, `de`, `es` avec les mêmes sections.
 - Chauffe, ouverture, sécurité : ne rien rendre pilotable « comme un thermostat » ou par un assistant
   vocal quand une erreur serait dangereuse (leçon d'OctoPrint).
+
+## Propre à cette intégration (Worx Landroid)
+
+**Le protocole** (appris de pyworxcloud/landroid_cloud, GPL-3.0, lus sans recopier, et
+d'ioBroker.worx, MIT) :
+
+- Connexion : `POST https://id.worx.com/oauth/token` (Kress `id.kress.com`, LandXcape
+  `id.landxcape-services.com`), JSON `{ grant_type: 'password', client_id, scope: '*', username,
+password }`, puis `refresh_token`. Les `client_id` sont ceux des applications mobiles.
+- REST : `GET https://api.worxlandroid.com/api/v2/product-items?status=1&gps_status=1` donne les
+  tondeuses avec `protocol`, `online`, `mqtt_endpoint`, `user_id`, `mqtt_topics.command_in/out`
+  et `last_status.payload` (`{ cfg, dat }`). `GET /api/v2/products` nomme les modèles.
+- MQTT : `wss://<mqtt_endpoint>/mqtt`, clientId `<WX|KR|LX>/USER/<user_id>/gladys/<uuid>`,
+  `clean: false`, QoS 1. Authentification par « custom authorizer » AWS IoT : le jeton passe dans
+  le **username** `gladys?jwt=<en-tête>.<charge>&x-amz-customauthorizer-name=''&x-amz-customauthorizer-signature=<signature>`,
+  base64url remis en base64 (`_`→`/`, `-`→`+`) puis encodé comme `urllib.parse.quote` de Python
+  (`/` gardé). Le nom d'autorisateur `''` est littéral, comme pyworxcloud en production.
+- Deux dialectes : **protocole 0** (fil périphérique) adressé par `sn`, `tm`/`dt` en heure
+  locale, planning `cfg.sc.m` (0 off, 1 on, 2 « party »), zone `cfg.mzv[dat.lz]` ;
+  **protocole 1** (Vision, RTK) adressé par `uuid`, `tm` ISO UTC, planning `cfg.sc.enabled` /
+  `paused`, zone `dat.cut.z`. Le délai de pluie s'envoie `{ rd }` en protocole 0 mais
+  `{ cfg: { rd } }` en protocole 1 (correctif pyworxcloud d'avril 2026). Bordure : `{ sc: { ots:
+{ bc: 1, wtm: 0 } } }` contre `{ cmd: 101 }`.
+- Kress compte `dat.rain.cnt` en **secondes**, les autres en minutes. L'erreur 5 n'est pas une
+  panne : c'est la pluie (statut « Pluie, en attente », jamais le déclencheur d'erreur).
+
+**Les pièges et choix :**
+
+- **Bannissement** : Worx bloque jusqu'à 24 h un compte trop bavard (l'application aussi). Les
+  budgets sont dans `src/worx/limits.js` et la doc ; ne pas les relâcher sans retour terrain.
+  Un 429 suspend tout (Retry-After ou 1 h doublée) et survit au redémarrage ; un mot de passe
+  refusé n'est jamais réessayé avant un changement de configuration.
+- La reconnexion MQTT est **la nôtre** (`reconnectPeriod: 0`) : chaque essai prend un jeton
+  frais, et le délai ne se remet à 1 min qu'après une connexion stable de 5 min.
+- Le **minuteur** REST se cale sur la dernière lecture : réarmé à chaque changement d'état de
+  MQTT, il ne repousse jamais une lecture due (un MQTT qui échoue en boucle aurait sinon bloqué
+  le REST).
+- `onPoll` du cœur ne lit le cloud que si le minuteur a plus d'une période et demie de retard ;
+  sinon il republie le cache (dédupliqué).
+- Démarrer, pause, retour, bordure sont des `button/push` ; le planning est un `input/binary`
+  inscriptible : jamais un `switch` qu'un assistant vocal pourrait basculer (lames).
+- Les catégories génériques du SDK (`counter-sensor`, `rain-sensor`,
+  `device-temperature-sensor`) n'ont pas de type propre : `DEVICE_FEATURE_TYPES.SENSOR.*`.
+  Le type de `signal` est `DEVICE_FEATURE_TYPES.SIGNAL.QUALITY` (`integer`).
+- Une fonctionnalité n'existe que si la tondeuse fournit la valeur (`when` dans
+  `src/devices.js`) : une nouvelle valeur fait proposer « Mettre à jour » dans la Découverte.
+- Fixtures **inventées** (`test/fixtures/worx/`) : les données de test de pyworxcloud sont sous
+  GPL, on ne les reprend pas.
+- Les accès réseau à `id.worx.com` et `api.worxlandroid.com` sont refusés dans les sessions de
+  code : seul `scripts/probe.mjs`, lancé ailleurs, éprouve le vrai cloud.

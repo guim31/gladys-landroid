@@ -1,30 +1,26 @@
 // -----------------------------------------------------------------------------
 // Integration configuration.
 //
-// The configuration is filled in by the user in Gladys, from the `config_schema`
-// declared in `gladys-assistant-integration.json`. The SDK fetches it for you
-// (`gladys.getConfig()`) and notifies you of every change through
-// `gladys.onConfigUpdated()`.
-//
-// This module only provides defaults and normalizes the received object, so the
-// rest of the code never has to deal with `undefined`.
+// Filled in by the user from the `config_schema` of the manifest. This module
+// only provides the defaults (they MUST match the manifest `default` values)
+// and normalizes the received object, so the rest of the code never deals
+// with `undefined` or with a value typed as a string by a form.
 // -----------------------------------------------------------------------------
 
-// Defaults: they MUST stay consistent with the `default` values declared in the
-// `config_schema` of the manifest.
+import { BRANDS } from './worx/clouds.js';
+
+/** The languages of the Gladys interface, the ones every text exists in. */
+export const LANGUAGES = ['en', 'fr', 'de', 'es'];
+
 export const DEFAULT_CONFIG = {
-  latitude: 48.8566, // Paris
-  longitude: 2.3522,
-  unit: 'celsius', // 'celsius' | 'fahrenheit'
-  // Seconds between two reads of the polled sensors. Gladys polls at most once
-  // a minute: slower intervals are applied by skipping polls (see
-  // createPoller in src/devices/index.js).
-  poll_frequency: 300,
-  // Reserved key (NOT in config_schema): because the manifest declares both
-  // 'local' and 'cloud' in its `transports` field, Gladys shows a standard
-  // "Prefer the local connection" toggle and sends the user's choice here.
-  // Read-only for the integration; defaults to true.
-  GLADYS_PREFER_LOCAL: true,
+  brand: 'worx', // 'worx' | 'kress' | 'landxcape': the cloud the account lives on
+  email: '',
+  password: '',
+  // Language of the feature names and of the texts the container produces
+  // (status, error): a device integration never receives the user's language.
+  language: 'fr',
+  // The position is personal data, and only a few models report it.
+  gps_enabled: false,
 };
 
 /**
@@ -32,14 +28,18 @@ export const DEFAULT_CONFIG = {
  * @param {Record<string, unknown>} raw config returned by the SDK
  */
 export function normalizeConfig(raw = {}) {
+  const brand = String(raw.brand ?? DEFAULT_CONFIG.brand).toLowerCase();
+  const language = String(raw.language ?? DEFAULT_CONFIG.language).toLowerCase();
   return {
-    ...DEFAULT_CONFIG,
-    ...raw,
-    // Force the types: config may arrive as strings from a form.
-    latitude: Number(raw.latitude ?? DEFAULT_CONFIG.latitude),
-    longitude: Number(raw.longitude ?? DEFAULT_CONFIG.longitude),
-    poll_frequency: Number(raw.poll_frequency ?? DEFAULT_CONFIG.poll_frequency),
-    // The preference is a boolean; anything but an explicit false means true.
-    GLADYS_PREFER_LOCAL: raw.GLADYS_PREFER_LOCAL !== false,
+    brand: Object.hasOwn(BRANDS, brand) ? brand : DEFAULT_CONFIG.brand,
+    email: String(raw.email ?? DEFAULT_CONFIG.email).trim(),
+    password: String(raw.password ?? DEFAULT_CONFIG.password),
+    language: LANGUAGES.includes(language) ? language : DEFAULT_CONFIG.language,
+    gps_enabled: raw.gps_enabled === true || raw.gps_enabled === 'true',
   };
+}
+
+/** The account can only be reached once both credentials are set. */
+export function isConfigured(config) {
+  return Boolean(config.email && config.password);
 }
